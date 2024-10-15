@@ -1,0 +1,8 @@
+{
+    "use_proxy": true,
+    "complete_task": true,
+    "play_game": true,
+    "game_ticket_to_play": 2,
+    "account_delay": 5,
+    "countdown_loop": 3800 
+}
