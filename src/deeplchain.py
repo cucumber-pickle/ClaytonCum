@@ -17,15 +17,15 @@ last_log_message = None
 
 def _banner():
     banner = r"""
- ██╗████████╗███████╗     ██╗ █████╗ ██╗    ██╗
- ██║╚══██╔══╝██╔════╝     ██║██╔══██╗██║    ██║
- ██║   ██║   ███████╗     ██║███████║██║ █╗ ██║
- ██║   ██║   ╚════██║██   ██║██╔══██║██║███╗██║
- ██║   ██║   ███████║╚█████╔╝██║  ██║╚███╔███╔╝
- ╚═╝   ╚═╝   ╚══════╝ ╚════╝ ╚═╝  ╚═╝ ╚══╝╚══╝  """ 
+      _____   _    _    _____   _    _   __  __   ____    ______   _____  
+     / ____| | |  | |  / ____| | |  | | |  \/  | |  _ \  |  ____| |  __ \ 
+    | |      | |  | | | |      | |  | | | \  / | | |_) | | |__    | |__) |
+    | |      | |  | | | |      | |  | | | |\/| | |  _ <  |  __|   |  _  / 
+    | |____  | |__| | | |____  | |__| | | |  | | | |_) | | |____  | | \ \ 
+     \_____|  \____/   \_____|  \____/  |_|  |_| |____/  |______| |_|  \_\ """
     print(Fore.GREEN + Style.BRIGHT + banner + Style.RESET_ALL)
     print(hju + f" ClaytonGame Telegram Bot")
-    print(mrh + f" FREE TO USE = Join us on {pth}t.me/DEEPLCHAIN")
+    print(mrh + f" FREE TO USE = Join us on {pth}t.me/cucumber_scripts")
     print(mrh + f" before start please '{hju}git pull{mrh}' to update bot")
     log_line()
 
