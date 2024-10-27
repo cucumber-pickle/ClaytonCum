@@ -29,7 +29,7 @@ TON Blockchain just made a post specifically about $CLAY @ClaytonOnTon. This pro
 1. **Clone the repository:**
 
    ```bash
-   git clone https://codeberg.org/nadirasaid8/ClaytonCum.git
+   https://github.com/cucumber-pickle/ClaytonCum.git
    cd ClaytonCum
    
 Create and activate a virtual environment:
