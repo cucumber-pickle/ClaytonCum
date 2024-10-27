@@ -60,18 +60,17 @@ class GameSession:
                     log(hju + f"Points: {pth}{usr.get('tokens', 'N/A'):,.0f} {hju}| XP: {pth}{usr.get('current_xp', 'N/A')}")
                     log(hju + f"Level: {pth}{usr.get('level', 'N/A')} {hju}| Tickets: {pth}{usr.get('daily_attempts', 0)}")
                     await self.check_in()
-                    break
+                    return True
                 elif resp.status_code == 401:
                     log(mrh + f"Login failed. Need update query_id!")
-                    break
+                    return False
                 else:
                     log(mrh + f"Login failed")
-                    break
-                    await asyncio.sleep(2)
+                    return True
             except Exception as e:
                 log(mrh + f"An error occurred check {hju}last.log")
                 log_error(f"{e}")
-                await asyncio.sleep(2)
+                return False
   
     async def check_in(self):
         lg_url = f"{self.b_url}/api/user/daily-claim"
@@ -296,18 +295,19 @@ async def main():
             prxy = prx[idx % len(prx)] if use_prxy and prx else None
             game = GameSession(acc, tgt_score, prxy)
 
-            await game.start()
-            if cpl_tsk:
-                await game.cpl_and_clm_tsk(tsk_type='daily')
-                await game.cpl_and_clm_tsk(tsk_type='partner')
-                await game.cpl_and_clm_tsk(tsk_type='default')
-                await game.cpl_and_clm_tsk(tsk_type='super')
+            login_suc = await game.start()
+            if login_suc:
+                if cpl_tsk:
+                    await game.cpl_and_clm_tsk(tsk_type='daily')
+                    await game.cpl_and_clm_tsk(tsk_type='partner')
+                    await game.cpl_and_clm_tsk(tsk_type='default')
+                    await game.cpl_and_clm_tsk(tsk_type='super')
 
-            if ply_game:
-                await game.run_g()
+                if ply_game:
+                    await game.run_g()
 
-            await countdown_timer(3)    
-            await game.claim_achievements()
+                await countdown_timer(3)
+                await game.claim_achievements()
 
             log_line()
             await countdown_timer(acc_dly)
