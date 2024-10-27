@@ -3,6 +3,7 @@ import asyncio
 import random
 import aiohttp
 from colorama import *
+from urllib.parse import parse_qs
 import json
 from datetime import datetime
 from . import *
@@ -14,7 +15,8 @@ class GameSession:
         self.b_url = "https://tonclayton.fun"
         self.s_id = None
         self.a_data = acc_data
-        self.hdrs = get_headers(self.a_data)
+        self.user_id = self.extract_user_id(self.a_data)
+        self.hdrs = get_headers(self.a_data, self.user_id)
         self.c_score = 0
         self.t_score = tgt_score
         self.inc = 10
@@ -31,6 +33,12 @@ class GameSession:
     def fmt_ts(ts):
         dt = datetime.fromisoformat(ts[:-1])
         return dt.strftime("%Y-%m-%d %H:%M:%S")
+
+    def extract_user_id(self, auth_data: str) -> dict:
+        query_params = parse_qs(auth_data)
+        user_info = json.loads(query_params['user'][0])
+        user_id = str(user_info.get('id'))
+        return user_id
 
     @staticmethod
     def proxy_format(proxy):
@@ -52,10 +60,14 @@ class GameSession:
                     log(hju + f"Points: {pth}{usr.get('tokens', 'N/A'):,.0f} {hju}| XP: {pth}{usr.get('current_xp', 'N/A')}")
                     log(hju + f"Level: {pth}{usr.get('level', 'N/A')} {hju}| Tickets: {pth}{usr.get('daily_attempts', 0)}")
                     await self.check_in()
-                    break  
+                    break
+                elif resp.status_code == 401:
+                    log(mrh + f"Login failed. Need update query_id!")
+                    break
                 else:
-                    log(mrh + f"Login failed Retrying...")
-                    await asyncio.sleep(2) 
+                    log(mrh + f"Login failed")
+                    break
+                    await asyncio.sleep(2)
             except Exception as e:
                 log(mrh + f"An error occurred check {hju}last.log")
                 log_error(f"{e}")

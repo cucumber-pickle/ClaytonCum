@@ -1,4 +1,7 @@
 import random
+import atexit
+import json
+from datetime import datetime, timedelta
 
 def generate_random_user_agent(device_type='android', browser_type='chrome'):
     chrome_versions = list(range(110, 127))
@@ -64,3 +67,45 @@ def generate_random_user_agent(device_type='android', browser_type='chrome'):
                     f"Firefox/{browser_version}.0")
 
     return None
+
+
+def save_user_agents(filename='src/user_agents.json'):
+    with open(filename, 'w') as f:
+        json.dump(user_agents, f, indent=4)
+
+
+def load_user_agents(filename='src/user_agents.json'):
+    try:
+        with open(filename, 'r') as f:
+            return json.load(f)
+    except FileNotFoundError:
+        return {}
+
+
+last_update_time = datetime.now()
+user_agents = load_user_agents()
+
+
+def get_user_agent(account):
+    global last_update_time
+    change_interval = 30
+    current_time = datetime.now()
+
+    if (current_time - last_update_time) > timedelta(minutes=change_interval):
+        last_update_time = current_time
+
+    if account not in user_agents:
+        new_user_agent = generate_random_user_agent()
+        while 'Mobile' not in new_user_agent:
+            new_user_agent = generate_random_user_agent()
+        user_agents[account] = new_user_agent
+        save_user_agents()
+
+    return user_agents[account]
+
+
+def save_user_agents_at_exit():
+    save_user_agents()
+
+
+atexit.register(save_user_agents_at_exit)
