@@ -102,7 +102,8 @@ class GameSession:
             g_tickets = json.load(cf).get("game_ticket_to_play", 1)
 
         for ticket in range(g_tickets):
-            game_choice = random.choice(['stack', 'tiles'])
+            # game_choice = random.choice(['stack', 'tiles'])
+            game_choice = random.choice(['stack'])
             log(hju + f"Play {pth}{game_choice} {hju}with ticket {pth}{ticket + 1}/{g_tickets}")
 
             if game_choice == 'stack':
@@ -114,7 +115,8 @@ class GameSession:
             await countdown_timer(5)
 
     async def play_stack_game(self):
-        if not await self.start_game(f"{self.b_url}/api/stack/st-game"):
+        session_id = await self.start_game(f"{self.b_url}/api/stack/st-game")
+        if not session_id:
             return False
 
         self.c_score = 0
@@ -125,31 +127,38 @@ class GameSession:
         return await self.end_game(f"{self.b_url}/api/stack/en-game", {"score": self.c_score, "multiplier": 1})
 
     async def play_tiles_game(self):
-        if not await self.start_game(f"{self.b_url}/api/game/start"):
+        session_id = await self.start_game(f"{self.b_url}/api/game/start")
+        if not session_id:
             return False
 
         max_tile = 2
-        updates = random.randint(7, 12)
+        updates = random.randint(7, 10)
+        # print(updates)
 
         for _ in range(updates):
-            await self.update_score(f"{self.b_url}/api/game/save-tile", {"maxTile": max_tile})
+            await self.update_score(f"{self.b_url}/api/game/save-tile", {"maxTile": max_tile, 'session_id':session_id})
             max_tile *= 2
 
-        return await self.end_game(f"{self.b_url}/api/game/over", {"multiplier": 1})
+        # print(max_tile)
+        return await self.end_game(f"{self.b_url}/api/game/over", {"maxTile": int(max_tile/2), "multiplier": 1, 'session_id':session_id})
 
     async def start_game(self, url):
         resp = self.scraper.post(url, headers=self.hdrs, json={})
-
+        # print(resp.status_code)
+        # print(resp.text)
         if resp.status_code != 200:
             error_msg = kng + "Game: ticket attempts are over" if "attempts are over" in resp.text else self.get_error_message(resp)
             log(f"{error_msg}")
             return False
-
+        if resp:
+            session_id = resp.json().get('session_id')
         log(bru + "Game started successfully")
-        return True
+        return session_id
 
     async def update_score(self, url, payload):
         resp = self.scraper.post(url, headers=self.hdrs, json=payload)
+        # print(resp.status_code)
+        # print(resp.text)
 
         if resp.status_code == 200:
             score_type = 'maxTile' if 'maxTile' in payload else 'score'
@@ -160,8 +169,10 @@ class GameSession:
         await countdown_timer(random.randint(5, 7))
 
     async def end_game(self, url, payload):
+        # print(payload)
         resp = self.scraper.post(url, headers=self.hdrs, json=payload)
-
+        # print(resp.status_code)
+        # print(resp.text)
         if resp.status_code == 200:
             res = resp.json()
             log(hju + "Game ended successfully")
