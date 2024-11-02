@@ -1,3 +1,5 @@
+import time
+
 import cloudscraper
 import asyncio
 import random
@@ -102,17 +104,33 @@ class GameSession:
             g_tickets = json.load(cf).get("game_ticket_to_play", 1)
 
         for ticket in range(g_tickets):
-            # game_choice = random.choice(['stack', 'tiles'])
-            game_choice = random.choice(['stack'])
+            games_to_play = cfg.get('play_games', "stack")
+            game_choice = random.choice(games_to_play)
             log(hju + f"Play {pth}{game_choice} {hju}with ticket {pth}{ticket + 1}/{g_tickets}")
 
             if game_choice == 'stack':
                 if not await self.play_stack_game():
                     break
-            else:
+            elif game_choice == 'tiles':
                 if not await self.play_tiles_game():
                     break
+            elif game_choice == 'clayball':
+                if not await self.play_clayball_play():
+                    break
+            else:
+                break
             await countdown_timer(5)
+
+    async def play_clayball_play(self):
+        session_id = await self.start_game(f"{self.b_url}/api/clay/start-game")
+        if not session_id:
+            return False
+
+        sleep = random.randint(10, 15)
+        await countdown_timer(sleep)
+        clayball_score = cfg.get('clayball_score')
+        score = random.randint(clayball_score[0], clayball_score[1])
+        return await self.end_game_clayball(f"{self.b_url}/api/clay/end-game", {"score": score})
 
     async def play_stack_game(self):
         session_id = await self.start_game(f"{self.b_url}/api/stack/st-game")
@@ -168,11 +186,23 @@ class GameSession:
 
         await countdown_timer(random.randint(5, 7))
 
-    async def end_game(self, url, payload):
-        # print(payload)
+    async def end_game_clayball(self, url, payload):
         resp = self.scraper.post(url, headers=self.hdrs, json=payload)
-        # print(resp.status_code)
-        # print(resp.text)
+        if resp.status_code == 200:
+            res = resp.json()
+            log(hju + "Game ended successfully")
+            log(hju + f"Points: {pth}{res.get('cl')}")
+        else:
+            log(mrh + self.get_error_message(resp))
+
+        await countdown_timer(5)
+        return True
+
+    async def end_game(self, url, payload):
+        print(payload)
+        resp = self.scraper.post(url, headers=self.hdrs, json=payload)
+        print(resp.status_code)
+        print(resp.text)
         if resp.status_code == 200:
             res = resp.json()
             log(hju + "Game ended successfully")

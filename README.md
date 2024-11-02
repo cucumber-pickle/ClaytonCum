@@ -48,9 +48,11 @@ pip install -r requirements.txt
 Create a config.json file in the root directory with the following structure:
    ```json
 {
-    "use_proxy": false,
+    "use_proxy": true,
     "complete_task": false,
-    "play_game": false,
+    "play_games": ["clayball", "stack"],
+    "clayball_score": [15, 160],
+    "play_game": true,
     "game_ticket_to_play": 2,
     "account_delay": 5,
     "countdown_loop": 3800 
@@ -61,6 +63,10 @@ Create a config.json file in the root directory with the following structure:
 `complete_task`: Enable the complete_task operation if set to true.
 
 `play_game`: Enable the play-game operation if set to true.
+
+`play_games` - Select games `clayball` or `stack` or leave both
+
+`clayball_score` - the number of points in clayball. 160 Max
 
 `game_ticket_to_play`: input the number of game tickets to play.
 

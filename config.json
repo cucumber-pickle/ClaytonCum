@@ -1,6 +1,8 @@
 {
     "use_proxy": true,
-    "complete_task": true,
+    "complete_task": false,
+    "play_games": ["clayball", "stack"],
+    "clayball_score": [15, 160],
     "play_game": true,
     "game_ticket_to_play": 2,
     "account_delay": 5,
