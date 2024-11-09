@@ -64,7 +64,7 @@ Create a config.json file in the root directory with the following structure:
 
 `play_game`: Enable the play-game operation if set to true.
 
-`play_games` - Select games `clayball` or `stack` or leave both
+`play_games` - Select games `clayball` or `stack` or `tiles` or leave all
 
 `clayball_score` - the number of points in clayball. 160 Max
 
