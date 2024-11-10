@@ -7,7 +7,7 @@ from os import system as sss
 
 if __name__ == "__main__":
     if s_name() == 'Windows':
-        sss(f'cls && title Otter_loot')
+        sss(f'cls && title Clayton bot')
     else:
         sss('clear')
     _clear()
